@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +20,7 @@ namespace pizza.Controllers
 
         private static List<BasketDto> _baskets;
         private readonly PizzaService _pizzaService = new PizzaService();
+        
         
         [HttpGet]
         public ActionResult<BasketDto> Get()
@@ -38,22 +41,41 @@ namespace pizza.Controllers
         }
         
         [HttpPost]
-        public ActionResult<BasketDto> Post(string name)
+        public  ActionResult<BasketDto> Post(string name)
         {
-            PizzaDto pizza = _pizzaService.GetPizzas(name);
-            
+            PizzaDto pizza = _pizzaService.GetPizzas(name).Result;
             if (!pizza.Equals(null))
             {
                 if (_baskets is null)
                 {
                     _baskets = new List<BasketDto>();
                 }
+
+                var myBasket = _baskets.FirstOrDefault(dto => dto.PizzaName == pizza.Name);
+                if (myBasket != null)
+                {
+                    _baskets.Remove(myBasket);
+                    var resultString = Regex.Match(myBasket.Price, @"-?\d+(?:\.\d+)?");
+                    var a = Double.Parse(resultString.ToString());
+                    var c = a / myBasket.quantity;
+                    var b = c += a;
+                    
+                    myBasket = new BasketDto(myBasket.Id, myBasket.PizzaName,c.ToString(),  
+                        myBasket.quantity += 1);
+                   _baskets.Add(myBasket);
+                   
+
+                }
+                else
+                {
+                    _baskets.Add(new BasketDto(1, pizza.Name, pizza.Price,1));
+                    
+                }
                 
-                _baskets.Add(new BasketDto(1, pizza.Name, pizza.Price));
                 return Ok(_baskets);
             }
             
-            return NotFound();
+            return NotFound(_baskets.Count);
         }
 
         [HttpGet]

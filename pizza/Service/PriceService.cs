@@ -34,7 +34,11 @@ namespace pizza.Service
 
             return (price, currency);
         }
+       
         
+
+       
+
         private static double ConvertToEur(this double usd)
         {
             return Math.Round(usd * 0.85, 2);

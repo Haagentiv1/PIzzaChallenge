@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using pizza.Domain;
 
 namespace pizza.Service
 {
     public class PizzaService
     {
-        public List<PizzaDto> GetPizzas()
+        public async Task<List<PizzaDto>> GetPizzas()
         {
-            return PizzaRepository.GetPizzas()
+            
+              return PizzaRepository.GetPizzas()
                 .Select(p => new PizzaDto(
                         p.Id,
                         p.Name,
@@ -17,9 +20,10 @@ namespace pizza.Service
                         PriceService.Get(p.Price)
                         ))
                     .ToList();
+              
         }
 
-        public PizzaDto GetPizzas(int id)
+        public async Task<PizzaDto> GetPizzas(int id)
         {
             return PizzaRepository.GetPizzas()
                 .Where(p => p.Id == id)
@@ -27,9 +31,9 @@ namespace pizza.Service
                 .FirstOrDefault();
         }
 
-        public PizzaDto GetPizzas(String name)
+        public async Task<PizzaDto> GetPizzas(String name)
         {
-            return convertToDto(
+            return await convertToDto(
                 PizzaRepository.GetPizzas()
                     .Where(p => p.Name == name)
                     .Select(p => p)
@@ -37,7 +41,9 @@ namespace pizza.Service
             );
         }
 
-        private PizzaDto convertToDto(Pizza pizza)
+
+
+        private async Task<PizzaDto> convertToDto(Pizza pizza)
         {
             if (pizza == null) return null;
 

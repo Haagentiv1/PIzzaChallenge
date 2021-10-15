@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using pizza.Custom;
 using pizza.Service;
@@ -36,14 +37,14 @@ namespace pizza.Controllers
         [Route("[controller]/{name}")]
         public ActionResult<PizzaDto> Get(string name)
         {
-            var pizza = _pizzaService.GetPizzas(name);
+            var pizza = _pizzaService.GetPizzas(name).Result;
 
             if (pizza is null)
             {
                 return NotFound();
             }
 
-            return Ok(_pizzaService.GetPizzas(name));
+            return Ok(_pizzaService.GetPizzas(name).Result);
         }
         
         [HttpGet]
